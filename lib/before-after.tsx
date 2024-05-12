@@ -18,13 +18,13 @@ const BeforeAfter = React.forwardRef<HTMLDivElement, BeforeAfterProps>(
 			const x = e.clientX - rect.left
 			const pos = (x / rect.width) * 100
 
-			if (pos < 1) {
+			if (pos < 0) {
 				setSliderPos(0)
 				return
 			}
 
-			if (pos > 99) {
-				setSliderPos(99)
+			if (pos > 100) {
+				setSliderPos(100)
 				return
 			}
 
@@ -81,6 +81,7 @@ const BeforeAfterTrack = React.forwardRef<HTMLDivElement, TrackProps>(
 					position: 'absolute',
 					top: 0,
 					left: 'var(--slider-pos)',
+					zIndex: 3,
 				}}
 				ref={forwardedRef}
 				{...props}
@@ -103,6 +104,7 @@ const BeforeAfterThumb = React.forwardRef<HTMLDivElement, ThumbProps>(
 					left: '50%',
 					transform: 'translate(-50%, -50%)',
 				}}
+				draggable={false}
 				ref={forwardedRef}
 				{...props}
 			/>
@@ -111,6 +113,92 @@ const BeforeAfterThumb = React.forwardRef<HTMLDivElement, ThumbProps>(
 )
 
 BeforeAfterThumb.displayName = 'Thumb'
+
+// BeforeImage
+interface BeforeImageProps extends React.ImgHTMLAttributes<HTMLImageElement> {}
+const BeforeImage = React.forwardRef<HTMLImageElement, BeforeImageProps>(
+	(props: BeforeImageProps, forwardedRef) => {
+		const ref = React.useRef<HTMLImageElement>(null)
+		const finalRef = forwardedRef || ref
+
+		React.useEffect(() => {
+			if (ref.current) {
+				const parent = ref.current.parentElement?.parentElement
+				if (!parent) return
+				const width = parent.clientWidth
+				const height = parent.clientHeight
+				ref.current.style.width = `${width}px`
+				ref.current.style.height = `${height}px`
+			}
+		}, [])
+
+		return (
+			<div
+				style={{
+					position: 'absolute',
+					inset: 0,
+					overflow: 'hidden',
+					zIndex: 2,
+					width: 'var(--slider-pos)',
+				}}
+			>
+				<img
+					style={{
+						userSelect: 'none',
+						width: '480px',
+						maxWidth: 'none',
+					}}
+					ref={finalRef}
+					draggable={false}
+					{...props}
+				/>
+			</div>
+		)
+	}
+)
+
+BeforeImage.displayName = 'BeforeImage'
+
+// AfterImage
+interface AfterImageProps extends React.ImgHTMLAttributes<HTMLImageElement> {}
+const AfterImage = React.forwardRef<HTMLImageElement, AfterImageProps>(
+	(props: AfterImageProps, forwardedRef) => {
+		const ref = React.useRef<HTMLImageElement>(null)
+		const finalRef = forwardedRef || ref
+
+		React.useEffect(() => {
+			if (ref.current) {
+				const parent = ref.current.parentElement?.parentElement
+				if (!parent) return
+				const width = parent.clientWidth
+				const height = parent.clientHeight
+				ref.current.style.width = `${width}px`
+				ref.current.style.height = `${height}px`
+			}
+		}, [])
+
+		return (
+			<div
+				style={{
+					width: '100%',
+					overflow: 'hidden',
+				}}
+			>
+				<img
+					style={{
+						userSelect: 'none',
+						width: '100%',
+						height: '100%',
+					}}
+					ref={finalRef}
+					{...props}
+				/>
+			</div>
+		)
+	}
+)
+
+AfterImage.displayName = 'AfterImage'
 
 const Root = BeforeAfter
 const Track = BeforeAfterTrack
@@ -124,6 +212,8 @@ export {
 	Root,
 	Track,
 	Thumb,
+	BeforeImage,
+	AfterImage,
 }
 
 export type { BeforeAfterProps }
