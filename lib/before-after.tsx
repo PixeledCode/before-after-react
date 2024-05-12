@@ -7,12 +7,62 @@ interface BeforeAfterProps extends React.HTMLAttributes<HTMLDivElement> {}
 
 const BeforeAfter = React.forwardRef<HTMLDivElement, BeforeAfterProps>(
 	(props: BeforeAfterProps, forwardedRef) => {
+		const [sliderPos, setSliderPos] = React.useState(50)
+		const ref = React.useRef<HTMLDivElement>(null)
+		const finalRef = forwardedRef || ref
+
+		const handleMouse = (e: MouseEvent) => {
+			const rect = ref.current?.getBoundingClientRect()
+			if (!rect) return
+
+			const x = e.clientX - rect.left
+			const pos = (x / rect.width) * 100
+
+			if (pos < 1) {
+				setSliderPos(0)
+				return
+			}
+
+			if (pos > 99) {
+				setSliderPos(99)
+				return
+			}
+
+			setSliderPos(pos)
+		}
+
+		const handleMouseUp = () => {
+			window.removeEventListener('mousemove', handleMouse)
+			window.removeEventListener('mouseup', handleMouseUp)
+		}
+
+		const handleMouseDown = () => {
+			window.addEventListener('mousemove', handleMouse)
+			window.addEventListener('mouseup', handleMouseUp)
+		}
+
+		React.useEffect(() => {
+			return () => {
+				window.removeEventListener('mousemove', handleMouse)
+				window.removeEventListener('mouseup', handleMouseUp)
+			}
+		}, [])
+
 		return (
 			<div
-				style={{
-					position: 'relative',
+				style={
+					{
+						position: 'relative',
+						'--slider-pos': `${sliderPos}%`,
+						overflow: 'hidden',
+					} as React.CSSProperties
+				}
+				ref={finalRef}
+				onMouseDown={handleMouseDown}
+				onClick={(e) => {
+					e.stopPropagation()
+					handleMouse(e as unknown as MouseEvent)
 				}}
-				ref={forwardedRef}
 				{...props}
 			/>
 		)
@@ -30,7 +80,7 @@ const BeforeAfterTrack = React.forwardRef<HTMLDivElement, TrackProps>(
 				style={{
 					position: 'absolute',
 					top: 0,
-					left: '50%',
+					left: 'var(--slider-pos)',
 				}}
 				ref={forwardedRef}
 				{...props}
@@ -52,7 +102,6 @@ const BeforeAfterThumb = React.forwardRef<HTMLDivElement, ThumbProps>(
 					top: '50%',
 					left: '50%',
 					transform: 'translate(-50%, -50%)',
-					pointerEvents: 'none',
 				}}
 				ref={forwardedRef}
 				{...props}
