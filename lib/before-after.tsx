@@ -114,6 +114,22 @@ const BeforeAfterThumb = React.forwardRef<HTMLDivElement, ThumbProps>(
 
 BeforeAfterThumb.displayName = 'Thumb'
 
+const innerDimensions = (node: Element) => {
+	const computedStyle = getComputedStyle(node)
+
+	let width = node.getBoundingClientRect().width
+	let height = node.getBoundingClientRect().height
+
+	height -=
+		parseFloat(computedStyle.paddingTop) +
+		parseFloat(computedStyle.paddingBottom)
+	width -=
+		parseFloat(computedStyle.paddingLeft) +
+		parseFloat(computedStyle.paddingRight)
+
+	return { height, width }
+}
+
 // BeforeImage
 interface BeforeImageProps extends React.ImgHTMLAttributes<HTMLImageElement> {}
 const BeforeImage = React.forwardRef<HTMLImageElement, BeforeImageProps>(
@@ -125,8 +141,7 @@ const BeforeImage = React.forwardRef<HTMLImageElement, BeforeImageProps>(
 			if (ref.current) {
 				const parent = ref.current.parentElement?.parentElement
 				if (!parent) return
-				const width = parent.clientWidth
-				const height = parent.clientHeight
+				const { width, height } = innerDimensions(parent)
 				ref.current.style.width = `${width}px`
 				ref.current.style.height = `${height}px`
 			}
@@ -136,7 +151,6 @@ const BeforeImage = React.forwardRef<HTMLImageElement, BeforeImageProps>(
 			<div
 				style={{
 					position: 'absolute',
-					inset: 0,
 					overflow: 'hidden',
 					zIndex: 2,
 					width: 'var(--slider-pos)',
@@ -145,7 +159,7 @@ const BeforeImage = React.forwardRef<HTMLImageElement, BeforeImageProps>(
 				<img
 					style={{
 						userSelect: 'none',
-						width: '480px',
+						width: '100%',
 						maxWidth: 'none',
 					}}
 					ref={finalRef}
@@ -170,25 +184,17 @@ const AfterImage = React.forwardRef<HTMLImageElement, AfterImageProps>(
 			if (ref.current) {
 				const parent = ref.current.parentElement?.parentElement
 				if (!parent) return
-				const width = parent.clientWidth
-				const height = parent.clientHeight
+				const { width, height } = innerDimensions(parent)
 				ref.current.style.width = `${width}px`
 				ref.current.style.height = `${height}px`
 			}
 		}, [])
 
 		return (
-			<div
-				style={{
-					width: '100%',
-					overflow: 'hidden',
-				}}
-			>
+			<div>
 				<img
 					style={{
 						userSelect: 'none',
-						width: '100%',
-						height: '100%',
 					}}
 					ref={finalRef}
 					{...props}
