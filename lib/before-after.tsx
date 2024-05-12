@@ -75,6 +75,7 @@ BeforeAfter.displayName = 'BeforeAfter'
 interface TrackProps extends React.HTMLAttributes<HTMLDivElement> {}
 const BeforeAfterTrack = React.forwardRef<HTMLDivElement, TrackProps>(
 	(props: BeforeAfterProps, forwardedRef) => {
+		// TODO: use innerDimensions to get the actual height
 		return (
 			<div
 				style={{
@@ -82,6 +83,7 @@ const BeforeAfterTrack = React.forwardRef<HTMLDivElement, TrackProps>(
 					top: 0,
 					left: 'var(--slider-pos)',
 					zIndex: 3,
+					paddingBlock: 'inherit',
 				}}
 				ref={forwardedRef}
 				{...props}
@@ -104,7 +106,6 @@ const BeforeAfterThumb = React.forwardRef<HTMLDivElement, ThumbProps>(
 					left: '50%',
 					transform: 'translate(-50%, -50%)',
 				}}
-				draggable={false}
 				ref={forwardedRef}
 				{...props}
 			/>
@@ -136,9 +137,11 @@ const BeforeImage = React.forwardRef<HTMLImageElement, BeforeImageProps>(
 	(props: BeforeImageProps, forwardedRef) => {
 		const ref = React.useRef<HTMLImageElement>(null)
 		const finalRef = forwardedRef || ref
+		const { children, ...others } = props
 
 		React.useEffect(() => {
 			if (ref.current) {
+				// TODO: use context to get the parent element
 				const parent = ref.current.parentElement?.parentElement
 				if (!parent) return
 				const { width, height } = innerDimensions(parent)
@@ -164,8 +167,9 @@ const BeforeImage = React.forwardRef<HTMLImageElement, BeforeImageProps>(
 					}}
 					ref={finalRef}
 					draggable={false}
-					{...props}
+					{...others}
 				/>
+				{children}
 			</div>
 		)
 	}
@@ -179,6 +183,7 @@ const AfterImage = React.forwardRef<HTMLImageElement, AfterImageProps>(
 	(props: AfterImageProps, forwardedRef) => {
 		const ref = React.useRef<HTMLImageElement>(null)
 		const finalRef = forwardedRef || ref
+		const { children, ...others } = props
 
 		React.useEffect(() => {
 			if (ref.current) {
@@ -196,15 +201,37 @@ const AfterImage = React.forwardRef<HTMLImageElement, AfterImageProps>(
 					style={{
 						userSelect: 'none',
 					}}
+					draggable={false}
 					ref={finalRef}
-					{...props}
+					{...others}
 				/>
+				{children}
 			</div>
 		)
 	}
 )
 
 AfterImage.displayName = 'AfterImage'
+
+// Content
+interface ContentProps extends React.HTMLAttributes<HTMLDivElement> {}
+const Content = React.forwardRef<HTMLDivElement, ContentProps>(
+	(props: ContentProps, forwardedRef) => {
+		return (
+			<div
+				style={{
+					userSelect: 'none',
+					position: 'absolute',
+					textWrap: 'nowrap',
+				}}
+				ref={forwardedRef}
+				{...props}
+			/>
+		)
+	}
+)
+
+Content.displayName = 'Content'
 
 const Root = BeforeAfter
 const Track = BeforeAfterTrack
@@ -219,6 +246,7 @@ export {
 	Track,
 	Thumb,
 	BeforeImage,
+	Content,
 	AfterImage,
 }
 

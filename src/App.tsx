@@ -1,4 +1,11 @@
-import { BeforeAfter, Track, Thumb, BeforeImage, AfterImage } from '@lib/index'
+import {
+	BeforeAfter,
+	Track,
+	Thumb,
+	BeforeImage,
+	AfterImage,
+	Content,
+} from '@lib/index'
 
 function App() {
 	return (
@@ -12,12 +19,19 @@ function App() {
 					src="https://plus.unsplash.com/premium_photo-1699708592614-4b52c61e456f"
 					alt=""
 					className="object-cover"
-				/>
+				>
+					<Content className="top-4 left-4">
+						<p>Before text</p>
+						<p>🚀</p>
+					</Content>
+				</BeforeImage>
 				<AfterImage
 					src="https://images.unsplash.com/photo-1715464502545-090ee1dc122f"
 					alt=""
 					className="object-cover"
-				/>
+				>
+					<Content className="top-4 right-4 text-white">After text</Content>
+				</AfterImage>
 			</BeforeAfter>
 		</main>
 	)
