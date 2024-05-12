@@ -12,8 +12,14 @@ export default defineConfig({
 			external: ['react', 'react/jsx-runtime'],
 		},
 		lib: {
-			entry: resolve(__dirname, 'lib/main.ts'),
+			entry: resolve(__dirname, 'lib/index.ts'),
 			formats: ['es'],
+		},
+	},
+	resolve: {
+		alias: {
+			'@src': resolve(__dirname, 'src'),
+			'@lib': resolve(__dirname, 'lib'),
 		},
 	},
 })
